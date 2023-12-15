@@ -67,4 +67,11 @@
         <nrWE>9</nrWE>
         <kontrakt>2C</kontrakt>
     </zapis>
+    <zapis>
+        <idTurniej>1</idTurniej>
+        <nrRozdania>4</nrRozdania>
+        <nrNS>1</nrNS>
+        <nrWE>5</nrWE>
+        <kontrakt>2C</kontrakt>
+    </zapis>
 </zapisy>
