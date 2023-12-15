@@ -253,7 +253,7 @@ output application/json
             </ee:message>
         </ee:transform>
     </flow>
-    <flow name="get:\ranking:bridge4-config">
+	<flow name="get:\ranking:bridge4-config">
         <ee:transform doc:name="Transform Message">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
@@ -285,7 +285,7 @@ output application/json
             </ee:message>
         </ee:transform>
     </flow>
-    <flow name="get:\zapis:bridge4-config">
+	<flow name="get:\zapis:bridge4-config">
         <ee:transform doc:name="Transform Message">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
@@ -360,7 +360,7 @@ output application/json
             </ee:message>
         </ee:transform>
     </flow>
-    <sub-flow name="getTournamentRanking" doc:id="0d22f5da-5f29-47af-a6d2-0cd5946a0db4">
+	<sub-flow name="getTournamentRanking" doc:id="0d22f5da-5f29-47af-a6d2-0cd5946a0db4">
 		<set-variable value="#[%dw 2.0&#10;output application/json&#10;---&#10;[]]" doc:name="dekl. tabl. z wynikami NS" doc:id="e6fcba97-c98d-4aac-b335-af3cff78aa3f" variableName="wynikiParNS" />
 		<set-variable value="#[%dw 2.0&#10;output application/json&#10;---&#10;[]]" doc:name="dekl. tabl. z wynikami WE" doc:id="31a674b2-5507-4763-b82f-a08cebc1479a" variableName="wynikiParWE" />
 		<db:select doc:name="Znajdz IDTurniej" doc:id="66787772-da04-4796-9bbe-e9abc2e2d695" config-ref="Database_Config" maxRows="1" target="IDTurniej" targetValue="#[payload[0].idTurniej]" transactionalAction="NOT_SUPPORTED">
@@ -376,6 +376,10 @@ output application/json
 			<db:input-parameters><![CDATA[#[idt: vars.IDTurniej]]]></db:input-parameters>
 		</db:select>
 		<set-payload value="#[%dw 2.0&#10;output application/json&#10;&#10;var mergedArray=vars.nryParNS ++ vars.nryParWE distinctBy $&#10;---&#10;mergedArray]" doc:name="Set Payload" doc:id="1800c064-ca94-409b-9191-f59a8abace42" />
+		<flow-ref doc:name="Pobierz dane z zapisów" doc:id="f142af54-6274-4460-8db0-786bbceb0ee8" name="pobierzDaneZZapisow" />
+		<flow-ref doc:name="Zapisz do rankingu" doc:id="3f326698-9c07-46a8-b9e2-6f0a413082f2" name="ZapiszDoRankingu" />
+	</sub-flow>
+	<sub-flow name="pobierzDaneZZapisow" doc:id="91020958-4da6-4ca4-a578-dcd4fb776163">
 		<foreach doc:name="For Each" doc:id="1574162a-88eb-4363-8e88-5e3a43488038" collection="#[payload]">
 			<db:select doc:id="b1c72745-94ec-4dc2-abbb-b1e81f544fb9" config-ref="Database_Config" target="pktyNS" doc:name="wylicz wyniki NS">
 				<db:sql><![CDATA[SELECT z.nrNS as nrPary,avg(z.procNS) as proc,
@@ -446,6 +450,8 @@ vars.wynikiParWE ++
 				</ee:variables>
 			</ee:transform>
 		</foreach>
+	</sub-flow>
+	<sub-flow name="ZapiszDoRankingu" doc:id="d03792f8-2a8c-4e9e-a3fe-6edddae50bfb">
 		<db:delete doc:id="c26456a7-29b9-4b37-aa52-806343cd1005" config-ref="Database_Config" doc:name="Delete">
 			<db:sql><![CDATA[DELETE from ranking where idTurniej=:idT]]></db:sql>
 			<db:input-parameters><![CDATA[#[{

@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_91020958_4da6_4ca4_a578_dcd4fb776163_Output_Variables_wynikiParNS = Array<Nothing>
+
