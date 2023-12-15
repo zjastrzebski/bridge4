@@ -26,9 +26,8 @@ local.properties
 .loadpath
 .project
 .classpath
-.mule
-.settings
-.vscode
+.settings/
+.vscode/
 echange-docs
 .classpath.project
 
