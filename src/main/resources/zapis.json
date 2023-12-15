@@ -1,4 +1,4 @@
-{
+[{
     "turniej": {
       "dataTurnieju": "2023-09-11",
       "zapis": [
@@ -7,12 +7,14 @@
           "nrNS": "1",
           "nrWE": "3",
           "kontrakt": "3BA=",
+          "wartosc": "300",
           "rozgr": "S"
         },
         {
           "nrRozdania": "2",
           "nrNS": "2",
           "nrWE": "4",
+          "wartosc": "-100",
           "kontrakt": "3BA-1",
           "rozgr": "S"
         },
@@ -20,6 +22,7 @@
           "nrRozdania": "2",
           "nrNS": "5",
           "nrWE": "9",
+          "wartosc": "130",
           "kontrakt": "2T+2",
           "rozgr": "S"
         },
@@ -27,6 +30,7 @@
           "nrRozdania": "2",
           "nrNS": "6",
           "nrWE": "8",
+          "wartosc": "500",
           "kontrakt": "2CX-3",
           "rozgr": "W"
         },
@@ -34,6 +38,7 @@
           "nrRozdania": "2",
           "nrNS": "7",
           "nrWE": "10",
+          "wartosc": "300",
           "kontrakt": "3BA=",
           "rozgr": "S"
         },
@@ -41,6 +46,7 @@
           "nrRozdania": "3",
           "nrNS": "1",
           "nrWE": "4",
+          "wartosc": "50",
           "kontrakt": "5T-1",
           "rozgr": "W"
         },
@@ -48,6 +54,7 @@
           "nrRozdania": "3",
           "nrNS": "2",
           "nrWE": "5",
+          "wartosc": "-110",
           "kontrakt": "3K",
           "rozgr": "E"
         },
@@ -55,6 +62,7 @@
           "nrRozdania": "3",
           "nrNS": "3",
           "nrWE": "7",
+          "wartosc": "0",
           "kontrakt": "4PASY",
           "rozgr": "E"
         },
@@ -62,14 +70,18 @@
           "nrRozdania": "3",
           "nrNS": "6",
           "nrWE": "9",
+          "wartosc": "110",
+          "rozgr": "S",
           "kontrakt": "2C"
         },
         {
           "nrRozdania": "4",
           "nrNS": "1",
           "nrWE": "5",
+          "wartosc": "110",
           "kontrakt": "2C"
         }
       ]
     }
   }
+  ]

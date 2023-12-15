@@ -446,7 +446,7 @@ vars.wynikiParWE ++
 	}]]]></db:input-parameters>
         </db:delete>
         <set-payload value="#[%dw 2.0&#xA;output application/json&#xA;var filteredNS = vars.wynikiParNS filter ($.nrPary != null)&#xA;var filteredWE=vars.wynikiParWE filter ($.nrPary !=null)&#xA;var mergedArray = (filteredNS ++ filteredWE) groupBy $.nrPary  &#xA;&#xA;var result = mergedArray pluck (value, key) -&gt; {&#xA;    &quot;nrPary&quot;: max(value.nrPary),&#xA;    &quot;nazw1&quot;: max(value.nazw1),&#xA;    &quot;nazw2&quot;: max(value.nazw2),&#xA;    &quot;procPary&quot;: avg(value.procPary),&#xA;} &#xA;var res1=result orderBy -$.procPary&#xA;&#xA;---&#xA;res1]" doc:name="Set Payload" doc:id="3fa93285-e817-49ca-aa82-eeda9a63d899" />
-        <foreach doc:name="For Each1" doc:id="6048be2c-dd87-4b7e-9b6d-2304622fb76b">
+        <foreach doc:name="Zapisz ranking do bazy" doc:id="6048be2c-dd87-4b7e-9b6d-2304622fb76b">
             <db:insert doc:id="9cfcf9c2-5362-4e04-b28f-5305e8602220" config-ref="Database_Config" doc:name="Insert">
                 <db:sql><![CDATA[INSERT into ranking(idTurniej,nrPary,miejsce,procPary,nazw1,nazw2) values(:idT,:nrPary,:place,:procPary,:idOs1,:idOs2)]]></db:sql>
                 <db:input-parameters><![CDATA[#[{
@@ -460,7 +460,29 @@ vars.wynikiParWE ++
             </db:insert>
         </foreach>
     </sub-flow>
-    <flow name="get:\osoba\(nazwiskoIImie):bridge4-config">
+    <sub-flow name="ZapiszDoRankingu1" doc:id="928a0801-b95f-4b33-bb4c-3a4dce02f6e7" >
+		<db:delete doc:name="Delete" doc:id="f3a563b0-d796-45eb-80b7-4033817246f1" config-ref="Database_Config" >
+			<db:sql ><![CDATA[DELETE from ranking where idTurniej=:idT]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	idT: vars.IDTurniej
+	}]]]></db:input-parameters>
+		</db:delete>
+		<set-payload value='#[%dw 2.0&#10;output application/json&#10;var filteredNS = vars.wynikiParNS filter ($.nrPary != null)&#10;var filteredWE=vars.wynikiParWE filter ($.nrPary !=null)&#10;var mergedArray = (filteredNS ++ filteredWE) groupBy $.nrPary  &#10;&#10;var result = mergedArray pluck (value, key) -&gt; {&#10;    "nrPary": max(value.nrPary),&#10;    "nazw1": max(value.nazw1),&#10;    "nazw2": max(value.nazw2),&#10;    "procPary": avg(value.procPary),&#10;} &#10;var res1=result orderBy -$.procPary&#10;&#10;---&#10;res1]' doc:name="Set Payload" doc:id="6cfe98ec-daaf-4eec-bea4-3e97a6c9b8f9" />
+		<foreach doc:name="For Each" doc:id="5b83780a-c104-4378-8bf1-d73d2e08d610" >
+			<db:insert doc:name="Insert" doc:id="534ac9df-e378-4c62-b996-7a2f0db29c5b" config-ref="Database_Config" >
+				<db:sql ><![CDATA[INSERT into ranking(idTurniej,nrPary,miejsce,procPary,nazw1,nazw2) values(:idT,:nrPary,:place,:procPary,:idOs1,:idOs2)]]></db:sql>
+				<db:input-parameters ><![CDATA[#[{
+	idT: vars.idTurniej,
+	nrPary: payload.nrPary,
+	place: payload.place,
+	procPary: payload.procPary,
+	nazw1: payload.nazw1,
+	nazw2: payload.nazw2
+}]]]></db:input-parameters>
+			</db:insert>
+		</foreach>
+	</sub-flow>
+	<flow name="get:\osoba\(nazwiskoIImie):bridge4-config">
         <ee:transform doc:name="Transform Message">
             <ee:variables>
                 <ee:set-variable variableName="nazwiskoIImie">attributes.uriParams.'nazwiskoIImie'</ee:set-variable>
@@ -544,17 +566,38 @@ output application/json
             <ee:variables>
                 <ee:set-variable variableName="dataTurnieju">attributes.uriParams.'dataTurnieju'</ee:set-variable>
             </ee:variables>
-        </ee:transform>		   
+        </ee:transform>
 		<ee:transform doc:name="Transform Message">
             <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
+                <ee:set-payload><![CDATA[%dw 2.0 
+output application/json 
 
-var zapisy= readUrl("classpath://zapis.json","application/json")
+fun calculatePercentage(dayData) = 
+    if (isEmpty(dayData)) []
+    else dayData map ((item) ->
+        {
+            nrRozdania: item.nrRozdania,
+            wartosc: item.wartosc,
+            proc: (item.wartosc* 100) / maxBy(dayData, (i) -> i.wartosc).wartosc
+        }
+    )
+    
+var zapisy= readUrl("classpath://zapis.json","application/json") 
+var zapisyZDnia = zapisy filter ($.turniej.dataTurnieju == vars.dataTurnieju)
+
+// Procent jest żle obliczany - bo bierze wartości pod uwagę a nie punkty na maxy, 
+// najpierw przydzielić punkty a dopiero pózniej policzyć procent.
 ---
-zapisy
+zapisyZDnia.turniej[0].zapis groupBy $.nrRozdania pluck ((value, key) -> {
+	nrRozdania: key,
+    data: calculatePercentage(value)
+})
+
+
+
 ]]></ee:set-payload>
             </ee:message>
         </ee:transform>
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="771617a5-d628-476c-98fd-490eca4fa95c" />
     </flow>
 </mule>
