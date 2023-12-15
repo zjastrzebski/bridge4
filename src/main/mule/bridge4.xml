@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
-http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
     <http:listener-config name="bridge4-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8081" />
     </http:listener-config>
     <apikit:config name="bridge4-config" api="bridge4.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
-    <db:config name="Database_Config" doc:name="Database Config" doc:id="8ca41bb6-4fd4-4875-9063-3f4d23fcd65a" >
-		<db:my-sql-connection host="localhost" port="3306" user="root" password="btkfOOqQnCfvZ1ZPPnTD" database="bridgeschema"/>
-		<expiration-policy maxIdleTime="30" timeUnit="SECONDS" />
-	</db:config>
+    <db:config name="Database_Config" doc:name="Database Config" doc:id="8ca41bb6-4fd4-4875-9063-3f4d23fcd65a">
+        <db:my-sql-connection host="localhost" port="3306" user="root" password="btkfOOqQnCfvZ1ZPPnTD" database="bridgeschema" />
+        <expiration-policy maxIdleTime="30" timeUnit="SECONDS" />
+    </db:config>
+    <file:config name="zapisy.JSON" doc:name="File Config" doc:id="fdf85f2c-2e81-4f73-9182-2e24bc1c79bb" />
 	<flow name="bridge4-main">
         <http:listener config-ref="bridge4-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -253,7 +253,7 @@ output application/json
             </ee:message>
         </ee:transform>
     </flow>
-	<flow name="get:\ranking:bridge4-config">
+    <flow name="get:\ranking:bridge4-config">
         <ee:transform doc:name="Transform Message">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
@@ -285,7 +285,7 @@ output application/json
             </ee:message>
         </ee:transform>
     </flow>
-	<flow name="get:\zapis:bridge4-config">
+    <flow name="get:\zapis:bridge4-config">
         <ee:transform doc:name="Transform Message">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
@@ -330,59 +330,46 @@ output application/json
         </ee:transform>
     </flow>
     <flow name="get:\ranking\(dataTurnieju):bridge4-config">
-        <ee:transform doc:name="Transform Message" doc:id="ae98dec2-b4b7-4efd-9d18-3d1c8318a036">
+        <ee:transform doc:name="pobierz datę turnieju" doc:id="ae98dec2-b4b7-4efd-9d18-3d1c8318a036">
             <ee:variables>
                 <ee:set-variable variableName="dataTurnieju"><![CDATA[attributes.uriParams.'dataTurnieju' as Date]]></ee:set-variable>
             </ee:variables>
         </ee:transform>
-        <flow-ref doc:name="getTournamentRanking" doc:id="0c74686d-65b9-4241-9b75-c306bf80a36b" name="getTournamentRanking"/>
-		<ee:transform doc:name="Transform Message">
+        <flow-ref doc:name="przelicz ranking" doc:id="0c74686d-65b9-4241-9b75-c306bf80a36b" name="przeliczRanking" />
+        <ee:transform doc:name="Transform Message">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-[
-  {
-    dataTurnieju: "2023-09-11",
-    nazw1: "Bronicka Agata",
-    nazw2: "Bronicka Iwona",
-    miejsce: 1,
-    proc: 61.3
-  }, 
-  {
-    dataTurnieju: "2023-09-11",
-    nazw1: "Kowalski Jan",
-    nazw2: "Nowak Kazimierz",
-    miejsce: 2,
-    proc: 59.1
-  }
-] as Array {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
+{
+	"message: ": "Ranking przeliczony"
+}]]></ee:set-payload>
             </ee:message>
         </ee:transform>
     </flow>
-	<sub-flow name="getTournamentRanking" doc:id="0d22f5da-5f29-47af-a6d2-0cd5946a0db4">
-		<set-variable value="#[%dw 2.0&#10;output application/json&#10;---&#10;[]]" doc:name="dekl. tabl. z wynikami NS" doc:id="e6fcba97-c98d-4aac-b335-af3cff78aa3f" variableName="wynikiParNS" />
-		<set-variable value="#[%dw 2.0&#10;output application/json&#10;---&#10;[]]" doc:name="dekl. tabl. z wynikami WE" doc:id="31a674b2-5507-4763-b82f-a08cebc1479a" variableName="wynikiParWE" />
-		<db:select doc:name="Znajdz IDTurniej" doc:id="66787772-da04-4796-9bbe-e9abc2e2d695" config-ref="Database_Config" maxRows="1" target="IDTurniej" targetValue="#[payload[0].idTurniej]" transactionalAction="NOT_SUPPORTED">
-			<db:sql ><![CDATA[SELECT t.idTurniej from turniej t where t.dataTurnieju=:dta]]></db:sql>
-			<db:input-parameters ><![CDATA[#[dta: vars.dataTurnieju]]]></db:input-parameters>
-		</db:select>
-		<db:select doc:id="8a4f6821-98e4-4ee1-9a9e-1d869baa2dc9" config-ref="Database_Config" doc:name="pobierzNryParNS" target="nryParNS">
-			<db:sql><![CDATA[SELECT distinct z.nrNS from zapis z where z.idTurniej=:idT order by z.nrNS]]></db:sql>
-			<db:input-parameters ><![CDATA[#[idT: vars.IDTurniej]]]></db:input-parameters>
-		</db:select>
-		<db:select doc:name="pobierz nry par WE" doc:id="9b5c41f8-c007-4e41-b520-1136c3f3aecd" config-ref="Database_Config" target="nryParWE">
-			<db:sql><![CDATA[SELECT distinct z.nrWE from zapis z where z.idTurniej=:idt order by z.nrWE]]></db:sql>
-			<db:input-parameters><![CDATA[#[idt: vars.IDTurniej]]]></db:input-parameters>
-		</db:select>
-		<set-payload value="#[%dw 2.0&#10;output application/json&#10;&#10;var mergedArray=vars.nryParNS ++ vars.nryParWE distinctBy $&#10;---&#10;mergedArray]" doc:name="Set Payload" doc:id="1800c064-ca94-409b-9191-f59a8abace42" />
-		<flow-ref doc:name="Pobierz dane z zapisów" doc:id="f142af54-6274-4460-8db0-786bbceb0ee8" name="pobierzDaneZZapisow" />
-		<flow-ref doc:name="Zapisz do rankingu" doc:id="3f326698-9c07-46a8-b9e2-6f0a413082f2" name="ZapiszDoRankingu" />
-	</sub-flow>
-	<sub-flow name="pobierzDaneZZapisow" doc:id="91020958-4da6-4ca4-a578-dcd4fb776163">
-		<foreach doc:name="For Each" doc:id="1574162a-88eb-4363-8e88-5e3a43488038" collection="#[payload]">
-			<db:select doc:id="b1c72745-94ec-4dc2-abbb-b1e81f544fb9" config-ref="Database_Config" target="pktyNS" doc:name="wylicz wyniki NS">
-				<db:sql><![CDATA[SELECT z.nrNS as nrPary,avg(z.procNS) as proc,
+    <sub-flow name="przeliczRanking" doc:id="0d22f5da-5f29-47af-a6d2-0cd5946a0db4">
+        <set-variable value="#[%dw 2.0&#xA;output application/json&#xA;---&#xA;[]]" doc:name="dekl. tabl. z wynikami NS" doc:id="e6fcba97-c98d-4aac-b335-af3cff78aa3f" variableName="wynikiParNS" />
+        <set-variable value="#[%dw 2.0&#xA;output application/json&#xA;---&#xA;[]]" doc:name="dekl. tabl. z wynikami WE" doc:id="31a674b2-5507-4763-b82f-a08cebc1479a" variableName="wynikiParWE" />
+        <db:select doc:name="Znajdz IDTurniej" doc:id="66787772-da04-4796-9bbe-e9abc2e2d695" config-ref="Database_Config" maxRows="1" target="IDTurniej" targetValue="#[payload[0].idTurniej]" transactionalAction="NOT_SUPPORTED">
+            <db:sql><![CDATA[SELECT t.idTurniej from turniej t where t.dataTurnieju=:dta]]></db:sql>
+            <db:input-parameters><![CDATA[#[dta: vars.dataTurnieju]]]></db:input-parameters>
+        </db:select>
+        <db:select doc:id="8a4f6821-98e4-4ee1-9a9e-1d869baa2dc9" config-ref="Database_Config" doc:name="pobierzNryParNS" target="nryParNS">
+            <db:sql><![CDATA[SELECT distinct z.nrNS from zapis z where z.idTurniej=:idT order by z.nrNS]]></db:sql>
+            <db:input-parameters><![CDATA[#[idT: vars.IDTurniej]]]></db:input-parameters>
+        </db:select>
+        <db:select doc:name="pobierz nry par WE" doc:id="9b5c41f8-c007-4e41-b520-1136c3f3aecd" config-ref="Database_Config" target="nryParWE">
+            <db:sql><![CDATA[SELECT distinct z.nrWE from zapis z where z.idTurniej=:idt order by z.nrWE]]></db:sql>
+            <db:input-parameters><![CDATA[#[idt: vars.IDTurniej]]]></db:input-parameters>
+        </db:select>
+        <set-payload value="#[%dw 2.0&#xA;output application/json&#xA;&#xA;var mergedArray=vars.nryParNS ++ vars.nryParWE distinctBy $&#xA;---&#xA;mergedArray]" doc:name="Set Payload" doc:id="1800c064-ca94-409b-9191-f59a8abace42" />
+        <flow-ref doc:name="Pobierz dane z zapisów" doc:id="f142af54-6274-4460-8db0-786bbceb0ee8" name="pobierzDaneZZapisow" />
+        <flow-ref doc:name="Zapisz do rankingu" doc:id="3f326698-9c07-46a8-b9e2-6f0a413082f2" name="ZapiszDoRankingu" />
+    </sub-flow>
+    <sub-flow name="pobierzDaneZZapisow" doc:id="91020958-4da6-4ca4-a578-dcd4fb776163">
+        <foreach doc:name="For Each" doc:id="1574162a-88eb-4363-8e88-5e3a43488038" collection="#[payload]">
+            <db:select doc:id="b1c72745-94ec-4dc2-abbb-b1e81f544fb9" config-ref="Database_Config" target="pktyNS" doc:name="wylicz wyniki NS">
+                <db:sql><![CDATA[SELECT z.nrNS as nrPary,avg(z.procNS) as proc,
    (SELECT o.nazwiskoIImie from osoba o where 
        o.idOsoba=(select p.idOsoba1 from paraturnieju p where p.idTurniej=z.idTurniej and p.nrPary=z.nrNS)
 	) as nazw1,
@@ -393,15 +380,15 @@ output application/json
     (SELECT p.idOsoba2 from paraturnieju p where p.idTurniej=z.idTurniej and p.nrPary=z.nrNS) as idOsoba2
 from zapis z where z.IDTurniej=:idT and z.nrNS=:nrPary
 group by nrPary,nazw1,idOsoba1,nazw2,idOsoba2]]></db:sql>
-				<db:input-parameters><![CDATA[#[{
+                <db:input-parameters><![CDATA[#[{
 	idT: vars.IDTurniej,
 	nrPary: vars.counter
 }]]]></db:input-parameters>
-			</db:select>
-			<ee:transform doc:name="ustaw wyniki NS" doc:id="3cdf4c75-6272-481e-a44d-b1c085fdada3">
-				<ee:message />
-				<ee:variables>
-					<ee:set-variable variableName="wynikiParNS"><![CDATA[%dw 2.0
+            </db:select>
+            <ee:transform doc:name="ustaw wyniki NS" doc:id="3cdf4c75-6272-481e-a44d-b1c085fdada3">
+                <ee:message />
+                <ee:variables>
+                    <ee:set-variable variableName="wynikiParNS"><![CDATA[%dw 2.0
 output application/json
 ---
 vars.wynikiParNS ++
@@ -413,10 +400,10 @@ vars.wynikiParNS ++
 		nazw2: vars.pktyNS[0].nazw2,
 	}
 ]]]></ee:set-variable>
-				</ee:variables>
-			</ee:transform>
-			<db:select doc:id="e40f971e-6d11-4153-ba4e-5be140f82fda" config-ref="Database_Config" target="pktyWE" doc:name="wylicz wniki WE">
-				<db:sql><![CDATA[SELECT z.nrWE as nrPary,avg(z.procWE) as proc,
+                </ee:variables>
+            </ee:transform>
+            <db:select doc:id="e40f971e-6d11-4153-ba4e-5be140f82fda" config-ref="Database_Config" target="pktyWE" doc:name="wylicz wniki WE">
+                <db:sql><![CDATA[SELECT z.nrWE as nrPary,avg(z.procWE) as proc,
    (SELECT o.nazwiskoIImie from osoba o where 
        o.idOsoba=(select p.idOsoba1 from paraturnieju p where p.idTurniej=z.idTurniej and p.nrPary=z.nrWE)
 	) as nazw1,
@@ -427,15 +414,15 @@ vars.wynikiParNS ++
     (SELECT p.idOsoba2 from paraturnieju p where p.idTurniej=z.idTurniej and p.nrPary=z.nrNS) as idOsoba2
 from zapis z where z.IDTurniej=:idT and z.nrWE=:nrPary
 group by nrPary,nazw1,idOsoba1,nazw2,idOsoba2]]></db:sql>
-				<db:input-parameters><![CDATA[#[{
+                <db:input-parameters><![CDATA[#[{
 	idT: vars.IDTurniej,
 	nrPary: vars.counter
 	}]]]></db:input-parameters>
-			</db:select>
-			<ee:transform doc:name="ustaw wyniki WE" doc:id="1c025dce-1348-4383-b951-394effa4c3e7">
-				<ee:message />
-				<ee:variables>
-					<ee:set-variable variableName="wynikiParWE"><![CDATA[%dw 2.0
+            </db:select>
+            <ee:transform doc:name="ustaw wyniki WE" doc:id="1c025dce-1348-4383-b951-394effa4c3e7">
+                <ee:message />
+                <ee:variables>
+                    <ee:set-variable variableName="wynikiParWE"><![CDATA[%dw 2.0
 output application/json
 ---
 vars.wynikiParWE ++
@@ -447,22 +434,22 @@ vars.wynikiParWE ++
 		nazw2: vars.pktyWE[0].nazw2,
 	}
 ]]]></ee:set-variable>
-				</ee:variables>
-			</ee:transform>
-		</foreach>
-	</sub-flow>
-	<sub-flow name="ZapiszDoRankingu" doc:id="d03792f8-2a8c-4e9e-a3fe-6edddae50bfb">
-		<db:delete doc:id="c26456a7-29b9-4b37-aa52-806343cd1005" config-ref="Database_Config" doc:name="Delete">
-			<db:sql><![CDATA[DELETE from ranking where idTurniej=:idT]]></db:sql>
-			<db:input-parameters><![CDATA[#[{
+                </ee:variables>
+            </ee:transform>
+        </foreach>
+    </sub-flow>
+    <sub-flow name="ZapiszDoRankingu" doc:id="d03792f8-2a8c-4e9e-a3fe-6edddae50bfb">
+        <db:delete doc:id="c26456a7-29b9-4b37-aa52-806343cd1005" config-ref="Database_Config" doc:name="Delete">
+            <db:sql><![CDATA[DELETE from ranking where idTurniej=:idT]]></db:sql>
+            <db:input-parameters><![CDATA[#[{
 	idT: vars.IDTurniej
 	}]]]></db:input-parameters>
-		</db:delete>
-		<set-payload value='#[%dw 2.0&#10;output application/json&#10;var filteredNS = vars.wynikiParNS filter ($.nrPary != null)&#10;var filteredWE=vars.wynikiParWE filter ($.nrPary !=null)&#10;var mergedArray = (filteredNS ++ filteredWE) groupBy $.nrPary  &#10;&#10;var result = mergedArray pluck (value, key) -&gt; {&#10;    "nrPary": max(value.nrPary),&#10;    "nazw1": max(value.nazw1),&#10;    "nazw2": max(value.nazw2),&#10;    "procPary": avg(value.procPary),&#10;} &#10;var res1=result orderBy -$.procPary&#10;&#10;---&#10;res1]' doc:name="Set Payload" doc:id="3fa93285-e817-49ca-aa82-eeda9a63d899" />
-		<foreach doc:name="For Each1" doc:id="6048be2c-dd87-4b7e-9b6d-2304622fb76b">
-			<db:insert doc:id="9cfcf9c2-5362-4e04-b28f-5305e8602220" config-ref="Database_Config" doc:name="Insert">
-				<db:sql><![CDATA[INSERT into ranking(idTurniej,nrPary,miejsce,procPary,nazw1,nazw2) values(:idT,:nrPary,:place,:procPary,:idOs1,:idOs2)]]></db:sql>
-				<db:input-parameters><![CDATA[#[{
+        </db:delete>
+        <set-payload value="#[%dw 2.0&#xA;output application/json&#xA;var filteredNS = vars.wynikiParNS filter ($.nrPary != null)&#xA;var filteredWE=vars.wynikiParWE filter ($.nrPary !=null)&#xA;var mergedArray = (filteredNS ++ filteredWE) groupBy $.nrPary  &#xA;&#xA;var result = mergedArray pluck (value, key) -&gt; {&#xA;    &quot;nrPary&quot;: max(value.nrPary),&#xA;    &quot;nazw1&quot;: max(value.nazw1),&#xA;    &quot;nazw2&quot;: max(value.nazw2),&#xA;    &quot;procPary&quot;: avg(value.procPary),&#xA;} &#xA;var res1=result orderBy -$.procPary&#xA;&#xA;---&#xA;res1]" doc:name="Set Payload" doc:id="3fa93285-e817-49ca-aa82-eeda9a63d899" />
+        <foreach doc:name="For Each1" doc:id="6048be2c-dd87-4b7e-9b6d-2304622fb76b">
+            <db:insert doc:id="9cfcf9c2-5362-4e04-b28f-5305e8602220" config-ref="Database_Config" doc:name="Insert">
+                <db:sql><![CDATA[INSERT into ranking(idTurniej,nrPary,miejsce,procPary,nazw1,nazw2) values(:idT,:nrPary,:place,:procPary,:idOs1,:idOs2)]]></db:sql>
+                <db:input-parameters><![CDATA[#[{
 	idT: vars.idTurniej,
 	nrPary: payload.nrPary,
 	place: payload.place,
@@ -470,10 +457,10 @@ vars.wynikiParWE ++
 	nazw1: payload.nazw1,
 	nazw2: payload.nazw2
 }]]]></db:input-parameters>
-			</db:insert>
-		</foreach>
-	</sub-flow>
-	<flow name="get:\osoba\(nazwiskoIImie):bridge4-config">
+            </db:insert>
+        </foreach>
+    </sub-flow>
+    <flow name="get:\osoba\(nazwiskoIImie):bridge4-config">
         <ee:transform doc:name="Transform Message">
             <ee:variables>
                 <ee:set-variable variableName="nazwiskoIImie">attributes.uriParams.'nazwiskoIImie'</ee:set-variable>
@@ -516,7 +503,7 @@ output application/json
             </ee:message>
         </ee:transform>
     </flow>
-	<flow name="post:\osoba:application\json:bridge4-config">
+    <flow name="post:\osoba:application\json:bridge4-config">
         <ee:transform doc:name="Transform Message">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
@@ -528,7 +515,7 @@ output application/json
             </ee:message>
         </ee:transform>
     </flow>
-	<flow name="post:\przeliczZapis:application\json:bridge4-config">
+    <flow name="post:\przeliczZapis:application\json:bridge4-config">
         <ee:transform doc:name="Transform Message">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
@@ -540,8 +527,8 @@ output application/json
             </ee:message>
         </ee:transform>
     </flow>
-	<flow name="post:\zapis:application\json:bridge4-config">
-        <ee:transform doc:name="Transform Message">
+    <flow name="post:\zapis:application\json:bridge4-config">
+        <ee:transform doc:name="Transform Message" doc:id="156acaae-57c5-4b5a-89ff-28fc6158633a">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -549,6 +536,24 @@ output application/json
 {
   message: "Zapis added to a database"
 } as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="get:\wczytajZapisy\(dataTurnieju):bridge4-config">
+        <ee:transform doc:name="Transform Message">
+            <ee:variables>
+                <ee:set-variable variableName="dataTurnieju">attributes.uriParams.'dataTurnieju'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>		   
+		<ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+
+var zapisy= readUrl("classpath://zapis.json","application/json")
+---
+zapisy
+]]></ee:set-payload>
             </ee:message>
         </ee:transform>
     </flow>

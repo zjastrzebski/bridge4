@@ -36,6 +36,16 @@ types:
               {
                 "message": "This endpoint is secured."
               }
+/wczytajZapisy/{dataTurnieju}:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              {
+                "message": "Zapisy wczytane"
+              }              
 /zapis: 
   get:
     queryParameters:
