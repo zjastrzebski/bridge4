@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="wynikiPar" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#3cdf4c75-6272-481e-a44d-b1c085fdada3"/>
+  <types:enrichment select="#1c025dce-1348-4383-b951-394effa4c3e7"/>
+</types:mule>

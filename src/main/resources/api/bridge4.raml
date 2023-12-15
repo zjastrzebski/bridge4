@@ -1,0 +1,322 @@
+#%RAML 1.0
+title: Bridge4
+mediaType: 
+  - application/json
+securitySchemes:
+  basicAuth:
+    type: Basic Authentication
+
+types: 
+  Zapis: !include types/zapis.raml
+  Para: !include types/para.raml
+  Osoba: !include types/osoba.raml
+  Ranking: !include types/ranking.raml
+
+/noCredentials:
+  get:
+    description: No credentials present
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "message": "This endpoint is not secured"
+              }
+
+/checkedCredentials:
+  get:
+    description: Endpoint is secured
+    securedBy: [basicAuth] # Applying basic authentication to this endpoint
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "message": "This endpoint is secured."
+              }
+/zapis: 
+  get:
+    queryParameters:
+      dataTurnieju: date-only
+      nrRozdania: integer
+    responses:
+      200: 
+        body:
+          application/json:
+            type: Zapis[]
+            example: 
+                [
+                  {
+                    dataTurnieju: 2023-09-11,
+                    nrRozdania: 1,
+                    nrWE: 1,
+                    nrNS: 2,
+                    kontrakt: "3K",
+                    rozgr: "S",
+                    wartosc: 110,
+                    pktyNS: 2,
+                    pktyWE: 2
+                  },
+                  {
+                    dataTurnieju: 2023-09-11,
+                    nrRozdania: 1,
+                    nrWE: 3,
+                    nrNS: 4,
+                    rozgr: "S",
+                    kontrakt: "4P",
+                    wartosc: -100,
+                    pktyNS: 0,
+                    pktyWE: 4
+                  },
+                  {
+                    dataTurnieju: 2023-09-11,
+                    nrRozdania: 1,
+                    nrWE: 5,
+                    nrNS: 6,
+                    rozgr: "S",
+                    kontrakt: "3P+1",
+                    wartosc: 170,
+                    pktyNS: 4,
+                    pktyWE: 0
+                  },
+                ]
+  post:
+    body:
+      application/json:
+        type: Zapis
+        example:
+          {
+            dataTurnieju: 2023-09-11,
+            nrRozdania: 1,
+            nrWE: 1,
+            nrNS: 2,
+            rozgr: "S",
+            kontrakt: "3K",
+            wartosc: 110,
+            pktyNS: 2,
+            pktyWE: 2
+          }
+    responses:
+      201:
+        body:
+          application/json:
+            example: 
+              {            
+                message: "Zapis added to a database"
+              }
+  /{nrNS}:
+    get:
+      queryParameters:
+        dataTurnieju: date-only
+        nrRozdania: integer
+      responses:
+        200: 
+          body:
+            application/json:
+              type: Zapis
+              example:
+                {
+                  "dataTurnieju": 2023-09-11,
+                  "nrRozdania": 1,
+                  "nrWE": 1,
+                  "nrNS": 2,
+                  "rozgr": "S",
+                  "kontrakt": "5K",
+                  "wartosc": -100,
+                  "pktyNS": 5,
+                  "pktyWE": 3
+                }
+/osoba:
+  post:
+    body:
+      application/json:
+        type: Osoba
+        example:
+          {
+            nazwiskoIImie: "Kowalski Jan",
+            archiwum: false,
+          }
+    responses: 
+      201: 
+        body: 
+          application/json:
+            example:
+              message: "Osoba dodana"
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            type: Osoba[]
+            example:
+              [
+                {
+                  archiwum: false,
+                  nazwiskoIImie: "Kowalski Jan"
+                },
+                {
+                  archiwum: false,
+                  nazwiskoIImie: "Nowak Kazimierz"
+                },
+                {
+                  archiwum: false,
+                  nazwiskoIImie: "Dalik Sławomir",
+                },
+                {
+                  archiwum: false,
+                  nazwiskoIImie: "Bronicki Dariusz"
+                },
+                {
+                  archiwum: false,
+                  nazwiskoIImie: "Bronicka Agata"
+                },
+                {
+                  archiwum: false,
+                  nazwiskoIImie: "Bronicka Iwona"
+                }
+              ]
+  /{nazwiskoIImie}:
+    delete:
+      responses: 
+        200: 
+          body:
+            application/json:
+              example:
+                message: "Osoba przeniesiona do archiwum"
+    get: 
+      responses:
+        200: 
+          body:
+            application/json:
+              type: Osoba
+              example:
+                {
+                  archiwum: false,
+                  nazwiskoIImie: "Bronicka Agata"
+                }
+/ranking:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            type: Ranking[]
+            example:
+              [
+                {
+                  dataTurnieju: 2023-09-11,
+                  nazw1: "Bronicka Agata",
+                  nazw2: "Bronicka Iwona",
+                  miejsce: 1,
+                  proc: 60.3
+                },
+                {
+                  dataTurnieju: 2023-09-11,
+                  nazw1: "Kowalski Jan",
+                  nazw2: "Nowak Kazimierz",
+                  miejsce: 2,
+                  proc: 58.2
+                },
+                {
+                  dataTurnieju: 2023-09-11,
+                  nazw1: "Dalik Sławomir",
+                  nazw2: "Bronicki Dariusz",
+                  miejsce: 3,
+                  proc: 57.0
+                }
+              ]
+  /{dataTurnieju}:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: Ranking[]
+              example:
+                [
+                  {
+                    dataTurnieju: 2023-09-11,
+                    nazw1: "Bronicka Agata",
+                    nazw2: "Bronicka Iwona",
+                    miejsce: 1,
+                    proc: 61.3
+                  },
+                  {
+                    dataTurnieju: 2023-09-11,
+                    nazw1: "Kowalski Jan",
+                    nazw2: "Nowak Kazimierz",
+                    miejsce: 2,
+                    proc: 59.1
+                  },
+                ]
+/przeliczZapis:
+  post:
+    body:
+      application/json:
+        type: Zapis
+        example: 
+          {
+            dataTurnieju: 2023-09-11,
+            nrRozdania: 1,
+            nrWE: 1,
+            nrNS: 2,
+            kontrakt: "3K",
+            rozgr: "S",
+            wartosc: 0,
+            pktyNS: 0,
+            pktyWE: 0
+          }
+    responses:
+      201: 
+        body:
+          application/json:
+            example:
+              message: "Contract recalculated"
+
+/przeliczTurniej/{dataTurnieju}:
+  get:
+    responses:
+      200: 
+        body:
+          application/json:
+            type: Zapis[]
+            example:
+              [
+                {
+                  dataTurnieju: 2023-09-11,
+                  nrRozdania: 1,
+                  kontrakt: "4K",
+                  rozgr: "S",
+                  nrNS: 1,
+                  nrWE: 2,
+                  wartosc: 130,
+                  pktyNS: 4,
+                  pktyWE: 0
+                },
+                {
+                  dataTurnieju: 2023-09-11,
+                  nrRozdania: 1,
+                  rozgr: "S",
+                  kontrakt: "3C-1",
+                  nrNS: 3,
+                  nrWE: 4,
+                  wartosc: -50,
+                  pktyNS: 0,
+                  pktyWE: 4,
+                },
+                {
+                  dataTurnieju: 2023-09-11,
+                  nrRozdania: 1,
+                  rozgr: "",
+                  kontrakt: "4 PASY",
+                  nrNS: 3,
+                  nrWE: 4,
+                  wartosc: 0,
+                  pktyNS: 2,
+                  pktyWE: 2,
+                },
+              ]
+
+              
