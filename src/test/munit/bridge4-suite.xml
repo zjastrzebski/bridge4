@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="bridge4-suite.xml" />
+	<munit:test name="get:\obliczZapis:bridge4-config-test" doc:id="bef68c73-c14b-4a05-99ef-1c46075fa0c9" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="cb0799b6-0d48-4486-9e7c-74c11e4ed325" >
+				<munit:payload value="#[readUrl('classpath://getobliczZapisbridge4configtest\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://getobliczZapisbridge4configtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://getobliczZapisbridge4configtest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get:\obliczZapis:bridge4-config" doc:id="24c0ce6d-8076-4b7c-ba80-cd886af2490a" name="get:\obliczZapis:bridge4-config"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-equals doc:name="obliczZapis za 3K" doc:id="48de41ff-600f-4598-8a32-265ed8c7887a" actual="#[payload]" expected='"110"' message="Value is not correct"/>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

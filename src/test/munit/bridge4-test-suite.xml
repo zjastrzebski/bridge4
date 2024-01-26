@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="bridge4-test-suite.xml" />
+	<munit:test name="bridge4-test-suite-get:\obliczZapis:bridge4-configTest" doc:id="799f0605-7c3a-4c7b-9cf5-eaef8cda272f" description="Test">
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get:\obliczZapis:bridge4-config" doc:id="8eb859af-a56f-4148-b830-5bb9fef64f29" name="get:\obliczZapis:bridge4-config"/>
+		</munit:execution>
+	</munit:test>
+
+
+</mule>

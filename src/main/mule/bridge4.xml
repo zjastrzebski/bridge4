@@ -596,30 +596,27 @@ zapisyZDnia.turniej[0].zapis groupBy $.nrRozdania pluck ((value, key) -> {
         </ee:transform>
         <set-payload value="#[payload]" doc:name="Set Payload" doc:id="771617a5-d628-476c-98fd-490eca4fa95c" />
     </flow>
-    <flow name="get:\obliczZapis\(nrRozdania)\(kontrakt):bridge4-config">
-        <ee:transform doc:name="Transform Message">
-            <ee:variables>
-                <ee:set-variable variableName="nrRozdania">attributes.uriParams.'nrRozdania'</ee:set-variable>
-                <ee:set-variable variableName="kontrakt">attributes.uriParams.'kontrakt'</ee:set-variable>
-            </ee:variables>
-        </ee:transform>
-        <ee:transform doc:name="Transform Message">
+    <flow name="get:\obliczZapis:bridge4-config" doc:id="a6f47c64-bb5f-4e1a-8ec6-ffd3343db74a">
+        <ee:transform doc:name="Transform Message" doc:id="47ea127e-3c20-47df-bb00-43353b4b051a">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
-var wysKontraktu=vars.kontrakt[0] as Number
-var jestKontra=vars.kontrakt contains "X"
-var jestRekontra=vars.kontrakt contains "XX"
-var kolor=vars.kontrakt[1]
-var piKier=(vars.kontrakt[1]=="P") or (vars.kontrakt[1]=="C")
-var kaTrefl=(vars.kontrakt[1]=="K") or (vars.kontrakt[1]=="T")
-var jestBez=vars.kontrakt contains "-"
-var ileBez=if(jestBez) (vars.kontrakt match /-(\d)/)[1] as Number else 0
-var saNadrobki = vars.kontrakt contains "+"
-var ileNadrobek=if(saNadrobki)(vars.kontrakt match /\+(\d+)/)[1] as Number else 0
+var kontrakt=attributes.queryParams.kontrakt
+var nrRozdania=attributes.queryParams.nrRozdania
+var rozgrywal=attributes.queryParams.rozgrywal
+var wysKontraktu=kontrakt[0] as Number
+var jestKontra=kontrakt contains "X"
+var jestRekontra=kontrakt contains "XX"
+var kolor=kontrakt[1]
+var piKier=(kontrakt[1]=="P") or (kontrakt[1]=="C")
+var kaTrefl=(kontrakt[1]=="K") or (kontrakt[1]=="T")
+var jestBez=kontrakt contains "-"
+var ileBez=if(jestBez) (kontrakt match /-(\d)/)[1] as Number else 0
+var saNadrobki = kontrakt contains "+"
+var ileNadrobek=if(saNadrobki)(kontrakt match /\+(\d+)/)[1] as Number else 0
 var zaBezZKontra=100
 var podKreska=
-		2*if (ileBez==0) 
+		if (ileBez==0) 
 			if (piKier) wysKontraktu*30 else 
 			if (kaTrefl) wysKontraktu*20 else 
 			40+(wysKontraktu-1)*30
@@ -628,7 +625,7 @@ var podKreska=
 var podKreskaZKontra=if (jestKontra) podKreska*2 else podKreska
 var podKreskaZRekontra=if (jestRekontra) podKreskaZKontra*2 else podKreskaZKontra
 var premiaZaPartie=
-	if (podKreskaZRekontra>100) 300 else 0
+	if (podKreskaZRekontra>100) 300 else 50 //czesciowka
 var zaNadrobki=
 	if (jestKontra) 
 		ileNadrobek*100 
@@ -649,9 +646,11 @@ var zaBez=
 
 ---
 
-podKreskaZRekontra+zaNadrobki+zaNieudanaKontre+zaBez+premiaZaPartie as Number {encoding: "UTF-8", mediaType: "application/json"
+podKreskaZRekontra+zaNadrobki+zaNieudanaKontre+zaBez+premiaZaPartie as String {encoding: "UTF-8", mediaType: "application/json"
 }]]></ee:set-payload>
             </ee:message>
+			<ee:variables >
+			</ee:variables>
         </ee:transform>
     </flow>
 </mule>

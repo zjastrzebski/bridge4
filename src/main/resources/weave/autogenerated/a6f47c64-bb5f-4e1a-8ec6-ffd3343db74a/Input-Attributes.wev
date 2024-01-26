@@ -1,6 +1,6 @@
 %dw 2.0
 
-type auto_a7de87a5_cfbb_488e_9cd9_ae1fb7553da1_Input_Attributes = {|
+type auto_a6f47c64_bb5f_4e1a_8ec6_ffd3343db74a_Input_Attributes = {|
   clientCertificate?: {|
     publicKey?: {|  |}, 
     "type"?: String, 
@@ -9,14 +9,18 @@ type auto_a7de87a5_cfbb_488e_9cd9_ae1fb7553da1_Input_Attributes = {|
   headers: {|  |}, 
   listenerPath: String, 
   method: String, 
-  queryParams: {|  |}, 
+  queryParams: {|
+    kontrakt: String, 
+    nrRozdania: String, 
+    rozgrywal: String
+  |}, 
   queryString: String, 
   relativePath: String, 
   remoteAddress: String, 
   requestPath: String, 
   requestUri: String, 
   scheme: String, 
-  uriParams: {| dataTurnieju: String |}, 
+  uriParams: {|  |}, 
   version: String, 
   localAddress: String
 |}
