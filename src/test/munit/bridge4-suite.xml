@@ -22,7 +22,7 @@
 			<flow-ref doc:name="Flow-ref to get:\obliczZapis:bridge4-config" doc:id="24c0ce6d-8076-4b7c-ba80-cd886af2490a" name="get:\obliczZapis:bridge4-config"/>
 		</munit:execution>
 		<munit:validation>
-			<munit-tools:assert-equals doc:name="obliczZapis za 3K" doc:id="48de41ff-600f-4598-8a32-265ed8c7887a" actual="#[payload]" expected='"110"' message="Value is not correct"/>
+			<munit-tools:assert-equals doc:name="obliczZapis za 3K" doc:id="48de41ff-600f-4598-8a32-265ed8c7887a" actual="#[payload]" expected='#[110 as Number]' message="Value is not correct"/>
 		</munit:validation>
 	</munit:test>
 
