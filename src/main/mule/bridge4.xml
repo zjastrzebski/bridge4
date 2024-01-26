@@ -9,7 +9,7 @@
         <expiration-policy maxIdleTime="30" timeUnit="SECONDS" />
     </db:config>
     <file:config name="zapisy.JSON" doc:name="File Config" doc:id="fdf85f2c-2e81-4f73-9182-2e24bc1c79bb" />
-	<flow name="bridge4-main">
+    <flow name="bridge4-main">
         <http:listener config-ref="bridge4-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
@@ -460,18 +460,18 @@ vars.wynikiParWE ++
             </db:insert>
         </foreach>
     </sub-flow>
-    <sub-flow name="ZapiszDoRankingu1" doc:id="928a0801-b95f-4b33-bb4c-3a4dce02f6e7" >
-		<db:delete doc:name="Delete" doc:id="f3a563b0-d796-45eb-80b7-4033817246f1" config-ref="Database_Config" >
-			<db:sql ><![CDATA[DELETE from ranking where idTurniej=:idT]]></db:sql>
-			<db:input-parameters ><![CDATA[#[{
+    <sub-flow name="ZapiszDoRankingu1" doc:id="928a0801-b95f-4b33-bb4c-3a4dce02f6e7">
+        <db:delete doc:name="Delete" doc:id="f3a563b0-d796-45eb-80b7-4033817246f1" config-ref="Database_Config">
+            <db:sql><![CDATA[DELETE from ranking where idTurniej=:idT]]></db:sql>
+            <db:input-parameters><![CDATA[#[{
 	idT: vars.IDTurniej
 	}]]]></db:input-parameters>
-		</db:delete>
-		<set-payload value='#[%dw 2.0&#10;output application/json&#10;var filteredNS = vars.wynikiParNS filter ($.nrPary != null)&#10;var filteredWE=vars.wynikiParWE filter ($.nrPary !=null)&#10;var mergedArray = (filteredNS ++ filteredWE) groupBy $.nrPary  &#10;&#10;var result = mergedArray pluck (value, key) -&gt; {&#10;    "nrPary": max(value.nrPary),&#10;    "nazw1": max(value.nazw1),&#10;    "nazw2": max(value.nazw2),&#10;    "procPary": avg(value.procPary),&#10;} &#10;var res1=result orderBy -$.procPary&#10;&#10;---&#10;res1]' doc:name="Set Payload" doc:id="6cfe98ec-daaf-4eec-bea4-3e97a6c9b8f9" />
-		<foreach doc:name="For Each" doc:id="5b83780a-c104-4378-8bf1-d73d2e08d610" >
-			<db:insert doc:name="Insert" doc:id="534ac9df-e378-4c62-b996-7a2f0db29c5b" config-ref="Database_Config" >
-				<db:sql ><![CDATA[INSERT into ranking(idTurniej,nrPary,miejsce,procPary,nazw1,nazw2) values(:idT,:nrPary,:place,:procPary,:idOs1,:idOs2)]]></db:sql>
-				<db:input-parameters ><![CDATA[#[{
+        </db:delete>
+        <set-payload value="#[%dw 2.0&#xA;output application/json&#xA;var filteredNS = vars.wynikiParNS filter ($.nrPary != null)&#xA;var filteredWE=vars.wynikiParWE filter ($.nrPary !=null)&#xA;var mergedArray = (filteredNS ++ filteredWE) groupBy $.nrPary  &#xA;&#xA;var result = mergedArray pluck (value, key) -&gt; {&#xA;    &quot;nrPary&quot;: max(value.nrPary),&#xA;    &quot;nazw1&quot;: max(value.nazw1),&#xA;    &quot;nazw2&quot;: max(value.nazw2),&#xA;    &quot;procPary&quot;: avg(value.procPary),&#xA;} &#xA;var res1=result orderBy -$.procPary&#xA;&#xA;---&#xA;res1]" doc:name="Set Payload" doc:id="6cfe98ec-daaf-4eec-bea4-3e97a6c9b8f9" />
+        <foreach doc:name="For Each" doc:id="5b83780a-c104-4378-8bf1-d73d2e08d610">
+            <db:insert doc:name="Insert" doc:id="534ac9df-e378-4c62-b996-7a2f0db29c5b" config-ref="Database_Config">
+                <db:sql><![CDATA[INSERT into ranking(idTurniej,nrPary,miejsce,procPary,nazw1,nazw2) values(:idT,:nrPary,:place,:procPary,:idOs1,:idOs2)]]></db:sql>
+                <db:input-parameters><![CDATA[#[{
 	idT: vars.idTurniej,
 	nrPary: payload.nrPary,
 	place: payload.place,
@@ -479,10 +479,10 @@ vars.wynikiParWE ++
 	nazw1: payload.nazw1,
 	nazw2: payload.nazw2
 }]]]></db:input-parameters>
-			</db:insert>
-		</foreach>
-	</sub-flow>
-	<flow name="get:\osoba\(nazwiskoIImie):bridge4-config">
+            </db:insert>
+        </foreach>
+    </sub-flow>
+    <flow name="get:\osoba\(nazwiskoIImie):bridge4-config">
         <ee:transform doc:name="Transform Message">
             <ee:variables>
                 <ee:set-variable variableName="nazwiskoIImie">attributes.uriParams.'nazwiskoIImie'</ee:set-variable>
@@ -567,7 +567,7 @@ output application/json
                 <ee:set-variable variableName="dataTurnieju">attributes.uriParams.'dataTurnieju'</ee:set-variable>
             </ee:variables>
         </ee:transform>
-		<ee:transform doc:name="Transform Message">
+        <ee:transform doc:name="Transform Message">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0 
 output application/json 
@@ -591,13 +591,67 @@ var zapisyZDnia = zapisy filter ($.turniej.dataTurnieju == vars.dataTurnieju)
 zapisyZDnia.turniej[0].zapis groupBy $.nrRozdania pluck ((value, key) -> {
 	nrRozdania: key,
     data: calculatePercentage(value)
-})
-
-
-
-]]></ee:set-payload>
+})]]></ee:set-payload>
             </ee:message>
         </ee:transform>
-		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="771617a5-d628-476c-98fd-490eca4fa95c" />
+        <set-payload value="#[payload]" doc:name="Set Payload" doc:id="771617a5-d628-476c-98fd-490eca4fa95c" />
+    </flow>
+    <flow name="get:\obliczZapis\(nrRozdania)\(kontrakt):bridge4-config">
+        <ee:transform doc:name="Transform Message">
+            <ee:variables>
+                <ee:set-variable variableName="nrRozdania">attributes.uriParams.'nrRozdania'</ee:set-variable>
+                <ee:set-variable variableName="kontrakt">attributes.uriParams.'kontrakt'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var wysKontraktu=vars.kontrakt[0] as Number
+var jestKontra=vars.kontrakt contains "X"
+var jestRekontra=vars.kontrakt contains "XX"
+var kolor=vars.kontrakt[1]
+var piKier=(vars.kontrakt[1]=="P") or (vars.kontrakt[1]=="C")
+var kaTrefl=(vars.kontrakt[1]=="K") or (vars.kontrakt[1]=="T")
+var jestBez=vars.kontrakt contains "-"
+var ileBez=if(jestBez) (vars.kontrakt match /-(\d)/)[1] as Number else 0
+var saNadrobki = vars.kontrakt contains "+"
+var ileNadrobek=if(saNadrobki)(vars.kontrakt match /\+(\d+)/)[1] as Number else 0
+var zaBezZKontra=100
+var podKreska=
+		2*if (ileBez==0) 
+			if (piKier) wysKontraktu*30 else 
+			if (kaTrefl) wysKontraktu*20 else 
+			40+(wysKontraktu-1)*30
+		else 
+			0
+var podKreskaZKontra=if (jestKontra) podKreska*2 else podKreska
+var podKreskaZRekontra=if (jestRekontra) podKreskaZKontra*2 else podKreskaZKontra
+var premiaZaPartie=
+	if (podKreskaZRekontra>100) 300 else 0
+var zaNadrobki=
+	if (jestKontra) 
+		ileNadrobek*100 
+	else 
+		if (kaTrefl) 
+			ileNadrobek*20 
+		else 
+			ileNadrobek*30
+var	zaNieudanaKontre=if (jestKontra and ileBez==0) 50 else 0
+var zaBez=
+	if (jestKontra) 
+		if (ileBez<4) 
+			100 + (ileBez-1)*200
+		else 
+			800+(ileBez-4)*300
+	else
+	   ileBez*50
+
+---
+
+podKreskaZRekontra+zaNadrobki+zaNieudanaKontre+zaBez+premiaZaPartie as Number {encoding: "UTF-8", mediaType: "application/json"
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
     </flow>
 </mule>

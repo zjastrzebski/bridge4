@@ -80,7 +80,7 @@
 		<dependency>
 			<groupId>5461eba1-043e-4a26-b3ad-70bc5657514c</groupId>
 			<artifactId>bridge4</artifactId>
-			<version>1.0.19</version>
+			<version>1.0.22</version>
 			<classifier>raml</classifier>
 			<type>zip</type>
 		</dependency>

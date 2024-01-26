@@ -284,7 +284,15 @@ types:
           application/json:
             example:
               message: "Contract recalculated"
-
+/obliczZapis/{nrRozdania}/{kontrakt}:
+  get:
+    responses:
+      200:
+        body: 
+          application/json:
+            type: integer
+            example:
+              110
 /przeliczTurniej/{dataTurnieju}:
   get:
     responses:
